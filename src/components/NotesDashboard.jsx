@@ -1,58 +1,68 @@
 import { useState, useEffect } from "react";
 import { FaDownload, FaFilePdf } from "react-icons/fa";
-import NavbarNext from "../components/NavbarNext";
+import NavbarNext from "./NavbarNext";
+import { useLocation } from "react-router-dom";
 
-const tabs = [
-  { label: "1st Semester", value: 1 },
-  { label: "2nd Semester", value: 2 },
-  { label: "3rd Semester", value: 3 },
-  { label: "4th Semester", value: 4 },
-];
+export default function NotesDahbaord() {
+  const location = useLocation();
 
-export default function McaTabsSyllabus() {
-  const [activeTab, setActiveTab] = useState(1); // store semester number
+  // Get data passed from SemesterCards
+  const { semester, subjects } = location.state || {};
+
+  // fallback (if user refreshes page)
+  const tabs = subjects;
+  const selectedSemester = semester;
+
+  const [activeTab, setActiveTab] = useState(tabs[0]);
   const [data, setData] = useState([]);
 
-  // -------- API CALL WHEN TAB CHANGES ----------
+  // -------- API CALL WHEN SUBJECT CHANGES ----------
   useEffect(() => {
-    fetch(`http://localhost:5000/syllabus/${activeTab}`)
+    if (!activeTab || !selectedSemester) return;
+
+    fetch(
+      `http://localhost:5000/notes/${selectedSemester}/${encodeURIComponent(
+        activeTab
+      )}`
+    )
       .then((res) => res.json())
       .then((result) => {
         setData(result);
       })
       .catch((err) => console.error("API ERROR:", err));
-  }, [activeTab]);
-
-  return (
+  }, [activeTab, selectedSemester]);
+  
+return (
     <div className="min-h-screen bg-gray-100">
+      {/* Navbar */}
       <NavbarNext />
 
       {/* Page Heading */}
-      <div className="text-center py-25">
+      <div className="text-center py-15 mt-10">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-800">
-          MCA Syllabus 
+          Subjectwise Notes 
         </h1>
+
         <div className="w-48 h-1 bg-gray-400 mx-auto mt-4 rounded-full"></div>
       </div>
 
       <section className="max-w-6xl mx-auto bg-white shadow-sm rounded-md p-6 mb-16">
-
         {/* Tabs */}
-        <div className="flex border-b border-gray-300">
+        <div className="flex border-b border-gray-300 ">
           {tabs.map((tab) => (
             <button
-              key={tab.value}
-              onClick={() => setActiveTab(tab.value)}
+              key={tab}
+              onClick={() => setActiveTab(tab)}
               className={`px-6 py-3 text-sm font-semibold border border-gray-200 border-b-0 relative whitespace-nowrap
                 ${
-                  activeTab === tab.value
+                  activeTab === tab
                     ? "bg-red-600 text-white"
                     : "bg-gray-50 text-gray-800 hover:bg-gray-100"
                 }`}
             >
-              {tab.label}
+              {tab}
 
-              {activeTab === tab.value && (
+              {activeTab === tab && (
                 <span
                   className="absolute left-1/2 -bottom-2 -translate-x-1/2 w-0 h-0 
                   border-l-8 border-r-8 border-t-8 
@@ -66,7 +76,7 @@ export default function McaTabsSyllabus() {
         {/* Tab Content */}
         <div className="border border-gray-200 p-6">
           {data.length === 0 ? (
-            <p className="text-gray-500 text-center">No syllabus uploaded yet.</p>
+            <p className="text-center text-gray-500">No notes found</p>
           ) : (
             data.map((file, index) => (
               <div
@@ -87,8 +97,8 @@ export default function McaTabsSyllabus() {
                   href={file.url}
                   download
                   className="flex items-center gap-2 px-4 py-2 text-sm 
-                             bg-blue-600 text-white rounded 
-                             hover:bg-blue-700 transition"
+                           bg-blue-600 text-white rounded 
+                           hover:bg-blue-700 transition"
                 >
                   <FaDownload />
                   Download

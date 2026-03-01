@@ -5,6 +5,7 @@ import HeroSection from "./HeroSection";
 import NotesSection from "./NotesSection"
 import PopularNotes from "./PopularNotes"
 import Footer from "./Footer"
+import AddResourceCard from "./AddResourceCard";
 
 
 function Home() {
@@ -20,6 +21,7 @@ function Home() {
       <HeroSection />
       <NotesSection />
       <PopularNotes />
+      <AddResourceCard/>
       <Footer />
 
       {/* <h2 style={{ textAlign: "center", marginTop: "100px"}}>Welcome to Home Page</h2>

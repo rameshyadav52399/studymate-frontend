@@ -1,111 +1,4 @@
-// import React, { useState } from "react";
-// import { Download, Eye, Search } from "lucide-react";
-// import NavbarNext from "./NavbarNext";
-
-
-// export default function Ebooks() {
-//   const [searchTerm, setSearchTerm] = useState("");
-
-//   const books = [
-//     { name: "Java Programming Fundamentals", pdf: "/ebooks/java-fundamentals.pdf" },
-//     { name: "C++ Complete Guide", pdf: "/ebooks/cpp-guide.pdf" },
-//     { name: "Data Structures & Algorithms", pdf: "/ebooks/dsa.pdf" },
-//     { name: "Web Development with React", pdf: "/ebooks/react-dev.pdf" },
-//     { name: "Database Management System", pdf: "/ebooks/dbms.pdf" },
-//   ];
-
-//   // Filter books based on search input
-//   const filteredBooks = books.filter((book) =>
-//     book.name.toLowerCase().includes(searchTerm.toLowerCase())
-//   );
-
-//   return (
-//     <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 py-10 px-4 md:px-16">
-//         <NavbarNext/>
-//       {/* Header */}
-//       <h1 className="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-8 mt-10">
-//         MCA E-Books Library
-//       </h1>
-
-//       {/* Search Bar */}
-//       <div className="flex justify-center mb-10">
-//         <div className="relative w-full md:w-1/2">
-//           <Search className="absolute left-3 top-3 text-gray-400" size={20} />
-//           <input
-//             type="text"
-//             placeholder="Search e-book by title..."
-//             value={searchTerm}
-//             onChange={(e) => setSearchTerm(e.target.value)}
-//             className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
-//           />
-//         </div>
-//       </div>
-
-//       {/* Table Container */}
-//       <div className="overflow-x-auto">
-//         <table className="w-full bg-white border border-gray-200 rounded-lg shadow-lg">
-//           <thead className="bg-blue-600 text-white">
-//             <tr>
-//               <th className="py-3 px-4 text-left text-lg font-semibold">Sr. No</th>
-//               <th className="py-3 px-4 text-left text-lg font-semibold">Book Name</th>
-//               <th className="py-3 px-4 text-center text-lg font-semibold">View</th>
-//               <th className="py-3 px-4 text-center text-lg font-semibold">Download</th>
-//             </tr>
-//           </thead>
-
-//           <tbody>
-//             {filteredBooks.length > 0 ? (
-//               filteredBooks.map((book, index) => (
-//                 <tr
-//                   key={index}
-//                   className="border-t hover:bg-gray-50 transition duration-200"
-//                 >
-//                   <td className="py-3 px-4 text-gray-700 font-medium">{index + 1}</td>
-//                   <td className="py-3 px-4 text-gray-700">{book.name}</td>
-
-//                   {/* View Icon */}
-//                   <td className="py-3 px-4 text-center">
-//                     <a
-//                       href={book.pdf}
-//                       target="_blank"
-//                       rel="noopener noreferrer"
-//                       className="inline-flex items-center justify-center bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition"
-//                     >
-//                       <Eye size={20} />
-//                     </a>
-//                   </td>
-
-//                   {/* Download Icon */}
-//                   <td className="py-3 px-4 text-center">
-//                     <a
-//                       href={book.pdf}
-//                       download
-//                       className="inline-flex items-center justify-center bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition"
-//                     >
-//                       <Download size={20} />
-//                     </a>
-//                   </td>
-//                 </tr>
-//               ))
-//             ) : (
-//               <tr>
-//                 <td
-//                   colSpan="4"
-//                   className="text-center py-6 text-gray-500 text-lg font-medium"
-//                 >
-//                   No e-books found.
-//                 </td>
-//               </tr>
-//             )}
-//           </tbody>
-//         </table>
-//       </div>
-//     </div>
-//   );
-// }
-
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Download, Search } from "lucide-react";
 import { FaFilePdf } from "react-icons/fa";
 import NavbarNext from "./NavbarNext";
@@ -114,22 +7,36 @@ export default function Ebooks() {
   const [searchTerm, setSearchTerm] = useState("");
   const [semester, setSemester] = useState("All");
   const [limit, setLimit] = useState("All");
+  const [books, setBooks] = useState([]);
 
-  const books = [
-    { name: "MCA 1st Sem Java Programming.pdf", pdf: "/ebooks/sem1-java.pdf", sem: 1 },
-    { name: "MCA 1st Sem C Programming.pdf", pdf: "/ebooks/sem1-c.pdf", sem: 1 },
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        const semParam = semester === "All" ? "all" : semester;
+        const res = await fetch(`http://localhost:5000/e-books/${semParam}`);
+        const data = await res.json();
 
-    { name: "MCA 2nd Sem DBMS.pdf", pdf: "/ebooks/sem2-dbms.pdf", sem: 2 },
-    { name: "MCA 2nd Sem OS.pdf", pdf: "/ebooks/sem2-os.pdf", sem: 2 },
+        if (!Array.isArray(data)) {
+          setBooks([]);
+          return;
+        }
 
-    { name: "MCA 3rd Sem Software Engineering.pdf", pdf: "/ebooks/sem3-se.pdf", sem: 3 },
-    { name: "MCA 3rd Sem CN.pdf", pdf: "/ebooks/sem3-cn.pdf", sem: 3 },
+        // ✅ FIX: convert semester to Number
+        const formattedData = data.map((item) => ({
+          name: item.name,
+          pdf: item.url,
+          sem: Number(item.semester),
+        }));
 
-    { name: "MCA 4th Sem Data Science.pdf", pdf: "/ebooks/sem4-ds.pdf", sem: 4 },
-    { name: "MCA 4th Sem AI.pdf", pdf: "/ebooks/sem4-ai.pdf", sem: 4 },
-  ];
+        setBooks(formattedData);
+      } catch (error) {
+        console.error("Fetch error:", error);
+      }
+    };
 
-  // 🔹 Filter logic
+    fetchBooks();
+  }, [semester]);
+
   let filteredBooks = books.filter((book) =>
     book.name.toLowerCase().includes(searchTerm.toLowerCase())
   );

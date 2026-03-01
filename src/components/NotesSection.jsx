@@ -47,7 +47,7 @@ export default function PopularNotes({
     } 
      else if (title === "Previous Papers") {
       // Example 1: Navigate to syllabus page
-      navigate("/previous-papers");
+      navigate("/pyqs");
      }
      else if (title === "Notes") {
       // Example 1: Navigate to syllabus page
