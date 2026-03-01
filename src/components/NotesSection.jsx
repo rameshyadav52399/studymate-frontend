@@ -1,5 +1,5 @@
 import React from "react";
-import previousePapersImg from "../assets/previouse-Papers.png";
+import previousePapersImg from "../assets/previouse-papers.png";
 import notesImg from "../assets/notes.png";
 import syllabusImg from "../assets/syllabus.png";
 import booksImg from "../assets/book.png";
@@ -94,3 +94,4 @@ export default function PopularNotes({
     </section>
   );
 }
+
